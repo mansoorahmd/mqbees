@@ -1,4 +1,4 @@
-Welcome to your new dbt project!
+Welcome to MQbees database!
 
 ### Using the mqbees project
  Pre Reqs
