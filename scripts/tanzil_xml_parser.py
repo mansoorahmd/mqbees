@@ -53,7 +53,7 @@ def getTanzilMetaDataSuras(xmlFile):
 def process_command(**kwargs):
     if 'filepath' in kwargs:
         print(f"Filepath: {kwargs['filepath']}")
-        print(getDFSurahAyahIndexed(kwargs['filepath']).head(5))
+        #print(getDFSurahAyahIndexed(kwargs['filepath']).head(5))
     else:
         print("no File Path is specified. python parser.py filepath=/path/to/file.xml")
         return
