@@ -1,0 +1,43 @@
+mqbees:
+  outputs:
+    dev:
+      type: postgres
+      threads: 1
+      host: mqbees.postgres.database.azure.com
+      port: 5432
+      user: postgres
+      pass: PassWord1@#
+      dbname: mqbees
+      schema: dev_schema
+
+    prod:
+      type: postgres
+      threads: 1
+      host: localhost
+      port: 5432
+      user: postgres
+      pass: password
+      dbname: mqbees
+      schema: mq
+
+    stag:
+      type: sqlite
+      database: 'tanzilquran.db'
+      schema: main
+      schemas_and_paths:
+        main: 'data\tanzilquran.db'
+      schema_directory: 'data'
+  target: stag
+
+# profiles.yml
+# mqbees_sqlite:
+#   target: dev
+#   outputs:
+#     dev:
+#       type: sqlite
+#       database: 'tanzilquran.db'
+#       schema: main
+#       schemas_and_paths:
+#         main: 'C:\Users\Mansoor Ahmad\Documents\Workspace\dbt-ibtida\mqbees\data\tanzilquran.db'
+#       schema_directory: 'C:\Users\Mansoor Ahmad\Documents\Workspace\dbt-ibtida\mqbees\data'
+
