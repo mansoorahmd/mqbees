@@ -4,6 +4,12 @@ Morphology file loading to Pandas and assigning global ayah index from 1 to 6236
 File is downloaded from corpus.quran.com
 """
 import sqlite3
+from constants import BUCKWALTER2UNICODE as b2u
+from constants import ROOT2BUCK as r2b
+import pandas as pd
+import numpy as np
+
+
 
 """BuckWalter to Unicode Converter"""
 def buckToUniString(buck):
@@ -28,6 +34,7 @@ def rootToUni(root):
         else:
             print(root)
     return uni
+
 def rootToBck(root):
     bck=""
     chList = root.split("-")
@@ -40,25 +47,24 @@ def rootToBck(root):
     return bck
 
 
-
 def featureRootExtract(f):
     if "ROOT:" in f:
         fts = f.split("|")
         for ft in fts:
             if "ROOT" in ft:
                 r = ft.split(":")
-                return(r[1])
+                return [r[1],buckToUniString(r[1])]
     else:
-        return None
+        return [None,None]
 def featureLemmaExtract(f):
     if "LEM:" in f:
         fts = f.split("|")
         for ft in fts:
             if "LEM" in ft:
                 r = ft.split(":")
-                return(buckToUniString(r[1]))
+                return [r[1],buckToUniString(r[1])]
     else:
-        return None
+        return [None,None]
 
 
 
@@ -90,8 +96,12 @@ def process_command(**kwargs):
     try:
         conn = sqlite3.connect('../data/tanzilquran.db')
         mor_df = loadMorphology(kwargs['filepath'])
-
-        getDFSurahAyahIndexed(kwargs['filepath']).to_sql(kwargs['tblname'],conn,if_exists='replace',index=True)
-        print("Databse table created! ")
+        mor_df[['BUCKROOT','UNICODEROOT']]  =  mor_df.FEATURES.apply(lambda x: pd.Series(featureRootExtract(x)))
+        
+        mor_df[['BUCKLEMMA','UNICODELEMMA']]  =  mor_df.FEATURES.apply(lambda x: pd.Series(featureLemmaExtract(x)))
+        
+        
+        mor_df.to_sql('morphology',conn,if_exists='replace',index=True)
+        print(f"Morphology Databse table created! ")
     except Exception as ex:
         print (f"Error: {ex}")
