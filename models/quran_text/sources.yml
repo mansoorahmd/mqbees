@@ -1,0 +1,12 @@
+version: 2
+sources:
+  - name: quran_sqlite_source
+    database: tanzilquran
+    schema: main
+    tables:
+      - name: sc_loaded_quran-simple-clean
+      - name: sc_loaded_quran-simple-min
+      - name: sc_loaded_quran-simple-plain
+      - name: sc_loaded_quran-simple
+      - name: sc_loaded_quran-uthmani-min
+      - name: sc_loaded_quran-uthmani

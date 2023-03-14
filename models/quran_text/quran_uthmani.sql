@@ -1,7 +1,7 @@
-with upstream_python_model as (
-
-    select * from {{ ref('tanzil_quran_text') }}
-
+-- model: quran_uthmani
+WITH sqlite_data AS (
+  SELECT ROW_NUMBER() OVER (ORDER BY SurahNumber,AyahNumber) - 1 as _index, *
+  FROM {{ source('quran_sqlite_source', 'sc_loaded_quran-uthmani') }}
 )
 SELECT *
-FROM upstream_python_model
+FROM sqlite_data;
