@@ -1,7 +1,7 @@
 version: 2
 sources:
   - name: quran_sqlite_source
-    database: tanzilquran
+    database: tanzilquran.db
     schema: main
     tables:
       - name: sc_loaded_quran-simple-clean
