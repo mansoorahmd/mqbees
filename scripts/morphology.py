@@ -3,6 +3,68 @@
 Morphology file loading to Pandas and assigning global ayah index from 1 to 6236
 File is downloaded from corpus.quran.com
 """
+import sqlite3
+
+"""BuckWalter to Unicode Converter"""
+def buckToUniString(buck):
+    result=""
+    for ch in buck:
+        try:
+            result += b2u[ch]
+        except:
+            return None
+            
+    return result
+"""Load Root Words"""
+
+def rootToUni(root):
+    uni=""
+    chList = root.split("-")
+    for ch in chList:
+        ch = ch.lstrip().rstrip()
+        if ch in r2b:
+            uni += buckToUniString(r2b[ch])
+            uni += " "
+        else:
+            print(root)
+    return uni
+def rootToBck(root):
+    bck=""
+    chList = root.split("-")
+    for ch in chList:
+        ch = ch.lstrip().rstrip().lstrip()
+        if ch in r2b:
+            bck += r2b[ch]
+        else:
+            print(root)
+    return bck
+
+
+
+def featureRootExtract(f):
+    if "ROOT:" in f:
+        fts = f.split("|")
+        for ft in fts:
+            if "ROOT" in ft:
+                r = ft.split(":")
+                return(r[1])
+    else:
+        return None
+def featureLemmaExtract(f):
+    if "LEM:" in f:
+        fts = f.split("|")
+        for ft in fts:
+            if "LEM" in ft:
+                r = ft.split(":")
+                return(buckToUniString(r[1]))
+    else:
+        return None
+
+
+
+
+
+
 def loadMorphology(morphologyFilePath):
     df = pd.read_csv(morphologyFilePath,names=['LOCATION','FORM','TAG','FEATURES'],skiprows=57,sep='\t')
     df[['Surah','Ayah','Word','SubWord']] = df.LOCATION.map(lambda x: x.lstrip('()').rstrip(')')).str.split(':',expand=True)
@@ -17,3 +79,19 @@ def loadMorphology(morphologyFilePath):
     wgrouped['autoIndex'] = np.arange(1,wgrouped.shape[0]+1)
     df['globalWord'] = wgrouped.autoIndex
     return df
+
+def process_command(**kwargs):
+    if 'filepath' in kwargs:
+        print(f"Filepath: {kwargs['filepath']}")
+    else:
+        print("no File Path is specified. python parser.py filepath=/path/to/file.xml")
+        return
+    
+    try:
+        conn = sqlite3.connect('../data/tanzilquran.db')
+        mor_df = loadMorphology(kwargs['filepath'])
+
+        getDFSurahAyahIndexed(kwargs['filepath']).to_sql(kwargs['tblname'],conn,if_exists='replace',index=True)
+        print("Databse table created! ")
+    except Exception as ex:
+        print (f"Error: {ex}")
