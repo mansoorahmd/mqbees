@@ -10,3 +10,5 @@ sources:
       - name: sc_loaded_quran-simple
       - name: sc_loaded_quran-uthmani-min
       - name: sc_loaded_quran-uthmani
+      - name: morphology
+      - name: roots_meanings

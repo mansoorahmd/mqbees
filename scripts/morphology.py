@@ -21,7 +21,10 @@ def buckToUniString(buck):
             return None
             
     return result
+
 """Load Root Words"""
+def rootWordsToPanda(arRootsFile):
+    return pd.read_csv(arRootsFile,names = ["Root", "Meanings"],sep=',')
 
 def rootToUni(root):
     uni=""
@@ -89,19 +92,32 @@ def loadMorphology(morphologyFilePath):
 def process_command(**kwargs):
     if 'filepath' in kwargs:
         print(f"Filepath: {kwargs['filepath']}")
+        try:
+            conn = sqlite3.connect('../data/tanzilquran.db')
+            mor_df = loadMorphology(kwargs['filepath'])
+            mor_df[['BUCKROOT','UNICODEROOT']]  =  mor_df.FEATURES.apply(lambda x: pd.Series(featureRootExtract(x)))
+            
+            mor_df[['BUCKLEMMA','UNICODELEMMA']]  =  mor_df.FEATURES.apply(lambda x: pd.Series(featureLemmaExtract(x)))
+            
+            
+            mor_df.to_sql('morphology',conn,if_exists='replace',index=True)
+            print(f"Morphology Databse table created! ")
+        except Exception as ex:
+            print (f"Error: {ex}")
+
+    elif 'rootfile' in kwargs:
+        print(f"Roots Filepath: {kwargs['rootfile']}")
+        # try:
+        conn = sqlite3.connect('../data/tanzilquran.db')
+        roots_df = rootWordsToPanda(kwargs['rootfile'])
+        roots_df['TRILETTER'] =  roots_df.Root.apply(lambda x: rootToUni(x))
+        roots_df['BUCK']      =  roots_df.Root.apply(lambda x: rootToBck(x))
+        roots_df.to_sql('roots_meanings',conn,if_exists='replace',index=True)
+        print(f"Roots Databse table created! ")
+
+        # except Exception as ex:
+        #     print (f"Error: {ex}")
     else:
-        print("no File Path is specified. python parser.py filepath=/path/to/file.xml")
+        print("no File Path is specified. python parser.py rootfile=/path/to/file.xml")
         return
     
-    try:
-        conn = sqlite3.connect('../data/tanzilquran.db')
-        mor_df = loadMorphology(kwargs['filepath'])
-        mor_df[['BUCKROOT','UNICODEROOT']]  =  mor_df.FEATURES.apply(lambda x: pd.Series(featureRootExtract(x)))
-        
-        mor_df[['BUCKLEMMA','UNICODELEMMA']]  =  mor_df.FEATURES.apply(lambda x: pd.Series(featureLemmaExtract(x)))
-        
-        
-        mor_df.to_sql('morphology',conn,if_exists='replace',index=True)
-        print(f"Morphology Databse table created! ")
-    except Exception as ex:
-        print (f"Error: {ex}")
