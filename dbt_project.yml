@@ -26,6 +26,8 @@ models:
       +materialized: table
     quran_info:
       +materialized: table 
+    quran_morphology:
+      +materialized: table
 
 seeds:
   mqbees:
